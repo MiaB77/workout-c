@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Cristi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --mint:#C8F0D8;--sage:#A8D8B8;--peach:#FFD6C0;--coral:#FFB89A;
+  --sky:#C4E4FF;--lav:#DDD0FF;--lemon:#FFF3C0;--cream:#FDFAF5;
+  --ink:#1E2A24;--muted:#6B7F72;--card:#FFFFFF;--border:#E8EDE9;
+  --green:#3DB87A;--r:16px;--rs:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;padding-bottom:30px;}
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#B8E8C8,#C4E4FF,#DDD0FF);padding:18px 16px 12px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.08);}
+.hdr h1{font-size:19px;font-weight:800;letter-spacing:-.5px;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:2px;}
+.equip-bar{display:flex;gap:5px;justify-content:center;margin-top:7px;flex-wrap:wrap;}
+.etag{background:rgba(255,255,255,.65);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;color:#1A5C3A;}
+/* NAV */
+.nav{display:flex;gap:3px;padding:10px 10px 0;overflow-x:auto;background:var(--cream);border-bottom:2px solid var(--border);scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.ntab{flex-shrink:0;padding:7px 12px;border:none;border-radius:20px 20px 0 0;background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:3px solid transparent;}
+.ntab.active{color:var(--ink);background:var(--mint);border-bottom-color:var(--green);}
+/* VIEWS */
+.view{display:none;padding:14px;}
+.view.active{display:block;}
+/* CARDS */
+.card{background:var(--card);border-radius:var(--r);border:1.5px solid var(--border);padding:14px;margin-bottom:12px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.bm{background:var(--mint);color:#1A5C3A;} .bp{background:var(--peach);color:#8B3A20;}
+.bs{background:var(--sky);color:#1A4A7A;} .bl{background:var(--lav);color:#3A2A7A;}
+.by{background:var(--lemon);color:#6B5A00;} .bc{background:var(--coral);color:#7A2A00;}
+/* TIP / WARN */
+.tip{background:var(--lemon);border-radius:var(--rs);padding:9px 11px;font-size:12px;line-height:1.6;margin-bottom:10px;color:#5A4800;}
+.tip strong{color:#3A2E00;}
+.warn{background:#FFF5F0;border:1.5px solid var(--coral);border-radius:var(--rs);padding:11px 13px;font-size:12px;line-height:1.7;margin-bottom:10px;}
+.warn strong{color:#8B3A20;}
+/* WORKOUT HEADER */
+.wo-hdr{background:linear-gradient(135deg,var(--mint),var(--sky));border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.wo-hdr h2{font-size:17px;font-weight:800;}
+.wo-hdr p{font-size:12px;color:var(--muted);margin-top:3px;}
+.wo-stats{display:flex;gap:8px;margin-top:10px;}
+.stat{flex:1;background:rgba(255,255,255,.7);border-radius:var(--rs);padding:7px;text-align:center;}
+.stat .sv{font-size:14px;font-weight:800;}
+.stat .sl{font-size:10px;color:var(--muted);font-weight:600;}
+/* EXERCISE CARD */
+.ex-card{border-radius:var(--r);border:1.5px solid var(--border);background:var(--card);margin-bottom:10px;overflow:hidden;}
+.ex-hdr{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;}
+.ex-num{width:28px;height:28px;border-radius:50%;background:var(--mint);color:#1A5C3A;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ex-main{flex:1;}
+.ex-name{font-size:14px;font-weight:700;}
+.ex-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.ex-tog{font-size:16px;color:var(--muted);transition:transform .2s;}
+.ex-tog.open{transform:rotate(180deg);}
+.ex-det{display:none;padding:0 14px 14px;border-top:1.5px solid var(--border);}
+.ex-det.open{display:block;}
+.sets-row{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px;}
+.set-item{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--rs);padding:8px 10px;font-size:11px;font-weight:600;}
+.set-item span{font-size:14px;font-weight:800;display:block;margin-top:2px;}
+.info-box{background:linear-gradient(135deg,#F0FDF6,#EFF6FF);border:1.5px solid var(--sage);border-radius:var(--rs);padding:12px 13px;margin-top:10px;font-size:13px;line-height:1.65;}
+.info-box strong{color:#1A5C3A;}
+.muscles-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.alt-box{background:var(--lemon);border-radius:var(--rs);padding:9px 11px;margin-top:8px;font-size:12px;line-height:1.5;}
+.alt-box strong{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6B5A00;}
+.eb{background:#E8F5E9;border:1px solid #A8D8B8;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;color:#1A5C3A;}
+/* START BTN */
+.start-btn{width:100%;padding:14px;border:none;border-radius:var(--r);background:linear-gradient(135deg,#3DB87A,#2A9D6A);color:white;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:12px;box-shadow:0 4px 20px rgba(61,184,122,.35);transition:transform .15s;}
+.start-btn:active{transform:translateY(1px);}
+/* WARMUP */
+.warmup-box{background:linear-gradient(135deg,#FFF3C0,#FFD6C0);border-radius:var(--r);padding:13px;margin-bottom:12px;border:1.5px solid var(--coral);}
+.warmup-box h3{font-size:13px;font-weight:800;margin-bottom:8px;color:#7A3A00;}
+.warmup-item{font-size:12px;padding:3px 0;line-height:1.5;color:#5A3000;}
+/* HOME — antrenament picker */
+.pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.pick-card{border-radius:var(--r);border:2px solid var(--border);background:var(--card);padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;}
+.pick-card:hover{border-color:var(--sage);background:#F7FDF9;transform:translateY(-1px);}
+.pick-card.wide{grid-column:span 2;}
+.pick-icon{font-size:28px;margin-bottom:6px;}
+.pick-name{font-size:13px;font-weight:800;color:var(--ink);}
+.pick-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+/* WEEK TRACKER */
+.week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
+.week-btn{padding:8px 4px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--card);font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;text-align:center;}
+.week-btn.active{border-color:var(--green);background:var(--mint);color:#1A5C3A;}
+.week-btn.done{background:#EDF9F2;border-color:var(--sage);}
+/* RUN */
+.run-card{background:linear-gradient(135deg,var(--sky),var(--lav));border-radius:var(--r);padding:20px;margin-bottom:12px;text-align:center;}
+.run-hr{font-size:52px;font-weight:800;font-family:'DM Mono',monospace;color:#1A4A7A;}
+/* PROGRESS */
+.prog-section{margin-bottom:18px;}
+.prog-section h3{font-size:14px;font-weight:800;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--border);}
+.mi-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px;}
+.mi{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:9px 11px;}
+.mi label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px;}
+.mi input,.mi select{width:100%;border:none;background:transparent;font-family:inherit;font-size:15px;font-weight:700;color:var(--ink);outline:none;}
+.save-btn{width:100%;padding:12px;border:none;border-radius:var(--rs);background:var(--green);color:white;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-top:5px;}
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);margin-bottom:5px;font-size:12px;}
+/* PHASE CARD (Nutritie) */
+.phase-card{background:var(--card);border-radius:var(--r);border:1.5px solid var(--border);overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.phase-card-head{padding:13px 16px;font-size:14px;font-weight:800;color:#1E2A24;}
+.phase-card-body{padding:14px 16px;font-size:13px;line-height:1.8;color:var(--ink);background:var(--card);}
+.phase-card-body strong{color:#1A5C3A;}
+/* TIMER */
+.timer-ov{display:none;position:fixed;inset:0;background:rgba(14,24,18,.97);z-index:200;flex-direction:column;align-items:center;overflow-y:auto;}
+.timer-ov.on{display:flex;}
+.t-top{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0;}
+.t-close{background:rgba(255,255,255,.12);border:none;border-radius:50%;width:36px;height:36px;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.t-bar{width:calc(100% - 32px);height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:12px 16px 0;overflow:hidden;}
+.t-fill{height:100%;background:linear-gradient(90deg,#3DB87A,#C4E4FF);border-radius:2px;transition:width .5s ease;}
+.t-phase{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin:18px 0 4px;text-align:center;}
+.t-name{font-size:22px;font-weight:800;color:white;text-align:center;padding:0 16px;line-height:1.25;}
+.t-clock{font-family:'DM Mono',monospace;font-size:80px;font-weight:500;color:white;text-align:center;margin:6px 0 2px;line-height:1;}
+.t-clock.cd{color:#FFB89A;} .t-clock.rest{color:#C4E4FF;}
+.t-pills{display:flex;gap:8px;margin:8px 16px 0;justify-content:center;flex-wrap:wrap;}
+.t-pill{background:rgba(255,255,255,.1);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:rgba(255,255,255,.9);}
+.t-info{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:var(--r);margin:12px 16px 0;padding:12px 14px;font-size:13px;color:rgba(255,255,255,.78);line-height:1.6;width:calc(100% - 32px);}
+.t-info strong{color:#C8F0D8;}
+.t-next{background:rgba(255,255,255,.05);border-radius:var(--rs);margin:8px 16px 0;padding:8px 12px;width:calc(100% - 32px);font-size:11px;color:rgba(255,255,255,.4);}
+.t-next strong{color:rgba(255,255,255,.75);font-size:12px;display:block;margin-top:2px;}
+.t-ctrls{display:flex;gap:10px;margin:18px 16px 24px;width:calc(100% - 32px);}
+.ctrl{flex:1;padding:13px;border:none;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.ctrl-g{background:linear-gradient(135deg,#3DB87A,#2A9D6A);color:white;box-shadow:0 4px 16px rgba(61,184,122,.4);}
+.ctrl-w{background:rgba(255,255,255,.12);color:white;}
+.ctrl-s{background:rgba(255,120,80,.18);color:#FFB89A;flex:0;padding:13px 14px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>💪 Program Cristi</h1>
+  <p>Recompozitie · Metabolism · Recuperare acasă</p>
+  <div class="equip-bar">
+    <span class="etag">🏋️ Gantere max 9kg</span>
+    <span class="etag">🔵 Benzi elastice</span>
+    <span class="etag">🟩 Saltea izopren</span>
+    <span class="etag">🪑 Scaun / Canapea</span>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="ntab active" onclick="showTab('t-home')">🏠 Acasă</button>
+  <button class="ntab" onclick="showTab('t-workout')">🏋️ Antrenament</button>
+  <button class="ntab" onclick="showTab('t-run')">🏃 Alergare</button>
+  <button class="ntab" onclick="showTab('t-mobility')">🧘 Mobilitate</button>
+  <button class="ntab" onclick="showTab('t-nutrition')">🍽️ Nutriție</button>
+  <button class="ntab" onclick="showTab('t-progress')">📊 Progres</button>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div id="t-home" class="view active">
+
+  <div class="tip">
+    <strong>Cum funcționează:</strong> Alege ce antrenament faci azi în funcție de cum te simți. Nu există o zi fixă pentru fiecare antrenament — tu decizi. Recomandarea pentru o săptămână completă e jos.
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,#C8F0D8,#C4E4FF)">
+    <div class="card-title">📅 Recomandare săptămână</div>
+    <div style="font-size:13px;line-height:1.9;color:var(--ink)">
+      💪 <strong>Upper Body</strong> — o dată<br>
+      🏃 <strong>Alergare Zona 2</strong> — de două ori<br>
+      🟣 <strong>Pilates Lower Body & Șolduri</strong> — o dată<br>
+      🟣 <strong>Pilates Core & Abdomen</strong> — o dată<br>
+      🧘 <strong>Mobilitate & Recuperare</strong> — o dată<br>
+      😴 <strong>Odihnă completă</strong> — două zile
+    </div>
+  </div>
+
+  <div class="warn">
+    <strong>⚠️ Regula de bază:</strong> Dacă noaptea după un antrenament dormi mai prost decât de obicei → data viitoare reduci cu o serie sau scurtezi cu 10 minute. Somnul e prioritatea #1.
+  </div>
+
+  <div style="font-size:14px;font-weight:800;margin-bottom:10px">🎯 Ce faci azi?</div>
+
+  <div class="pick-grid">
+    <div class="pick-card" onclick="openWorkout('upper')">
+      <div class="pick-icon">💪</div>
+      <div class="pick-name">Upper Body</div>
+      <div class="pick-sub">7 exerciții · ~45 min</div>
+    </div>
+    <div class="pick-card" onclick="showTab('t-run')">
+      <div class="pick-icon">🏃</div>
+      <div class="pick-name">Alergare Zona 2</div>
+      <div class="pick-sub">25–40 min · 109–127 bpm</div>
+    </div>
+    <div class="pick-card" onclick="showPilates('lower')">
+      <div class="pick-icon">🟣</div>
+      <div class="pick-name">Pilates Lower Body</div>
+      <div class="pick-sub">Move with Nicole · 30–40 min</div>
+    </div>
+    <div class="pick-card" onclick="showPilates('core')">
+      <div class="pick-icon">🟣</div>
+      <div class="pick-name">Pilates Core & Abdomen</div>
+      <div class="pick-sub">Move with Nicole · 30–40 min</div>
+    </div>
+    <div class="pick-card" onclick="showTab('t-mobility')">
+      <div class="pick-icon">🧘</div>
+      <div class="pick-name">Mobilitate</div>
+      <div class="pick-sub">Recuperare activă · 35 min</div>
+    </div>
+    <div class="pick-card" style="background:#FAFAFA;cursor:default">
+      <div class="pick-icon">😴</div>
+      <div class="pick-name">Odihnă completă</div>
+      <div class="pick-sub">Mers ușor opțional</div>
+    </div>
+  </div>
+
+  <!-- Tracker săptămână -->
+  <div class="card">
+    <div class="card-title">📊 Tracker săptămână curentă</div>
+    <div id="week-tracker" style="font-size:13px;color:var(--muted)"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap" id="log-btns"></div>
+  </div>
+
+</div>
+
+<!-- ═══ WORKOUT ═══ -->
+<div id="t-workout" class="view">
+  <div id="wo-content">
+    <div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:14px">
+      Selectează un antrenament din tabul <strong>Acasă</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PILATES ═══ -->
+<div id="t-pilates" class="view">
+  <div id="pilates-content"></div>
+</div>
+
+<!-- ═══ RUN ═══ -->
+<div id="t-run" class="view">
+  <div class="run-card">
+    <div style="font-size:13px;font-weight:700;color:#1A4A7A;margin-bottom:4px">🎯 Zona 2 — Puls țintă</div>
+    <div class="run-hr">109–127</div>
+    <div style="font-size:13px;color:var(--muted);font-weight:600">bpm · 60–70% din 182 FC max</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📐 Structura alergării</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--muted)">
+      🚶 <strong style="color:var(--ink)">5 min mers rapid</strong> — încălzire<br>
+      🏃 <strong style="color:var(--ink)">15–30 min</strong> — alergare ușoară în Z2<br>
+      &nbsp;&nbsp;&nbsp;<em>Dacă pulsul depășește 127 → treci pe mers până scade</em><br>
+      🚶 <strong style="color:var(--ink)">5 min mers lent</strong> — revenire
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🕐 Durată pe faze</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--muted)">
+      <strong style="color:var(--ink)">Faza 1 (săpt 1–4):</strong> 25–30 min<br>
+      <strong style="color:var(--ink)">Faza 2 (săpt 5–8):</strong> 30–35 min<br>
+      <strong style="color:var(--ink)">Faza 3 (săpt 9–12):</strong> 35–40 min
+    </div>
+  </div>
+  <div class="tip"><strong>Test vorbit:</strong> Dacă poți purta o conversație fără să te oprești = ești în Zona 2 ✅<br><strong>Suprafață:</strong> Parc cu teren plat, iarbă sau tartan. Evită betonul.</div>
+</div>
+
+<!-- ═══ MOBILITY ═══ -->
+<div id="t-mobility" class="view">
+  <div class="wo-hdr">
+    <h2>🧘 Mobilitate & Recuperare</h2>
+    <p>Saltea izopren · 35–40 minute</p>
+    <div class="wo-stats">
+      <div class="stat"><div class="sv">7</div><div class="sl">Exerciții</div></div>
+      <div class="stat"><div class="sv">35–40</div><div class="sl">Minute</div></div>
+      <div class="stat"><div class="sv">Lent</div><div class="sl">Ritm</div></div>
+    </div>
+  </div>
+  <button class="start-btn" onclick="startMobility()">▶ Pornește cu timer</button>
+  <div class="tip">Nu forța nicio poziție. Mergi până la limita confortabilă. Respiră adânc în zonele de tensiune.</div>
+  <div id="mob-list"></div>
+</div>
+
+<!-- ═══ NUTRITION ═══ -->
+<div id="t-nutrition" class="view">
+  <div class="card" style="background:linear-gradient(135deg,#C8F0D8,#C4E4FF)">
+    <div class="card-title">🎯 Necesar zilnic estimat</div>
+    <div style="font-size:13px;line-height:1.8;color:var(--ink)">
+      Calculat pentru 89–90 kg, 183 cm, 38 ani.<br><br>
+      <strong>Zi de antrenament:</strong> ~2450–2500 kcal<br>
+      <strong>Zi de odihnă/mobilitate:</strong> ~2200–2250 kcal<br>
+      <strong>Proteină:</strong> 160–170 g (fix în fiecare zi)<br>
+      <strong>Grăsimi:</strong> 75–85 g · <strong>Carbo:</strong> mai mulți în zilele active
+    </div>
+  </div>
+  <div class="tip"><strong>Deficit ușor (~10–12%)</strong> pentru recompozitie. Proteina fixă în fiecare zi. Carbohidrați mai mulți în zilele de antrenament/alergare. Evită carbohidrații rafinați — zahăr, pâine albă, sucuri.</div>
+  <div class="warn"><strong>⚠️ Rezistență la insulină:</strong> Interval de 4–5 ore între mese, fără gustări dese. Proteină la fiecare masă. Surse complexe de carbo: ovăz, orez brun, cartofi, leguminoase, fructe întregi.</div>
+
+  <div class="phase-card">
+    <div class="phase-card-head" style="background:#C8F0D8">💪 Zi Upper Body — ~2330 kcal</div>
+    <div class="phase-card-body">
+      <strong>Proteine: ~164g · Carbohidrați: ~203g · Grăsimi: ~94g</strong><br><br>
+      <strong>Mic dejun (608 kcal):</strong><br>
+      • 3 ouă întregi<br>
+      • Pâine integrală 3 felii (90g)<br>
+      • Avocado ½ (80g)<br>
+      • Roșii + castravete<br><br>
+      <strong>Gustare pre-antrenament (213 kcal):</strong><br>
+      • Banană mare (130g)<br>
+      • Unt de arahide 1 lingură (16g)<br><br>
+      <strong>Prânz / Post-antrenament (724 kcal):</strong><br>
+      • Piept pui 200g (gătit)<br>
+      • Orez brun 200g (gătit)<br>
+      • Broccoli + morcov 150g<br>
+      • Ulei măsline 1 lingură<br><br>
+      <strong>Cină (787 kcal):</strong><br>
+      • Somon 180g<br>
+      • Cartof dulce 220g (copt)<br>
+      • Salată verde + roșii<br>
+      • Iaurt grecesc 150g<br>
+      • Nuci 20g
+    </div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-card-head" style="background:#C4E4FF">🏃 Zi Alergare Zona 2 — ~2234 kcal</div>
+    <div class="phase-card-body">
+      <strong>Proteine: ~182g · Carbohidrați: ~185g · Grăsimi: ~81g</strong><br><br>
+      <em style="color:var(--muted)">Înainte de alergare dimineața: stomacul gol e ok pentru Z2 — doar apă.</em><br><br>
+      <strong>Mic dejun după alergare (630 kcal):</strong><br>
+      • 3 ouă întregi<br>
+      • Pâine integrală 3 felii (90g)<br>
+      • Brânză telemea 50g<br>
+      • Roșii + ardei<br><br>
+      <strong>Prânz (684 kcal):</strong><br>
+      • Curcan sau pui 200g<br>
+      • Quinoa 170g (gătit)<br>
+      • Legume colorate 150g<br>
+      • Ulei măsline 1 lingură<br><br>
+      <strong>Gustare (353 kcal):</strong><br>
+      • Iaurt grecesc 200g<br>
+      • Banană (120g)<br>
+      • Migdale 20g<br><br>
+      <strong>Cină (567 kcal):</strong><br>
+      • Pește alb (cod/tilapia) 200g<br>
+      • Orez brun 180g (gătit)<br>
+      • Spanac + roșii la tigaie<br>
+      • Ulei măsline 1 lingură
+    </div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-card-head" style="background:#DDD0FF">🟣 Zi Pilates — ~1940 kcal</div>
+    <div class="phase-card-body">
+      <strong>Proteine: ~148g · Carbohidrați: ~170g · Grăsimi: ~77g</strong><br><br>
+      <strong>Mic dejun (495 kcal):</strong><br>
+      • Fulgi de ovăz 70g<br>
+      • Lapte 200ml<br>
+      • Fructe de pădure 100g<br>
+      • Unt de arahide 1 lingură (16g)<br><br>
+      <strong>Prânz (636 kcal):</strong><br>
+      • Piept pui 180g<br>
+      • Orez brun 150g (gătit)<br>
+      • Legume mixte 150g la abur<br>
+      • Ulei măsline 1 lingură<br><br>
+      <strong>Gustare (261 kcal):</strong><br>
+      • Brânză de vaci 200g<br>
+      • Nuci 20g<br><br>
+      <strong>Cină (548 kcal):</strong><br>
+      • Somon 160g<br>
+      • Cartof 200g (fiert)<br>
+      • Broccoli + morcov 150g<br>
+      • Ulei măsline 1 linguriță
+    </div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-card-head" style="background:#E8EDE9">😴 Zi Odihnă / Mobilitate — ~2082 kcal</div>
+    <div class="phase-card-body">
+      <strong>Proteine: ~158g · Carbohidrați: ~137g · Grăsimi: ~101g</strong><br><br>
+      <strong>Mic dejun (518 kcal):</strong><br>
+      • 3 ouă întregi<br>
+      • Avocado ½ (80g)<br>
+      • Pâine integrală 2 felii (60g)<br>
+      • Roșii cherry<br><br>
+      <strong>Prânz (763 kcal):</strong><br>
+      • Piept pui 180g<br>
+      • Cartofi fierți 200g<br>
+      • Salată mare + ulei măsline 1 lingură<br>
+      • Nuci 25g<br><br>
+      <strong>Gustare (246 kcal):</strong><br>
+      • Brânză de vaci 200g<br>
+      • Migdale 20g<br><br>
+      <strong>Cină (555 kcal):</strong><br>
+      • Somon 160g<br>
+      • Orez brun 150g (gătit)<br>
+      • Broccoli la abur 150g<br>
+      • Ulei măsline 1 linguriță
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💊 Suplimentare (de discutat cu medicul)</div>
+    <div style="font-size:12.5px;line-height:1.8;color:var(--muted)">
+      • <strong style="color:var(--ink)">Vitamina D3 + K2</strong> — 4000–5000 UI/zi<br>
+      • <strong style="color:var(--ink)">Magneziu Glicinat</strong> — 300–400 mg seara<br>
+      • <strong style="color:var(--ink)">Omega-3</strong> — 2–3g/zi<br>
+      • <strong style="color:var(--ink)">Zinc</strong> — 25–30 mg/zi<br>
+      • <strong style="color:var(--ink)">Berberină</strong> — 500mg × 2/zi cu mesele
+    </div>
+  </div>
+  <div class="tip"><strong>Hidratare:</strong> 2.5–3 litri apă/zi. Un pahar mare la trezire.<br><strong>Cafeina:</strong> evită după ora 13:00.</div>
+</div>
+
+<!-- ═══ PROGRESS ═══ -->
+<div id="t-progress" class="view">
+  <div class="warn">
+    <strong>⚠️ Reduceți volumul dacă apar 2+ semne:</strong><br>
+    • Somn mai prost după antrenament (2 nopți consecutive)<br>
+    • Puls odihnă cu 5–7 bpm mai mare dimineața<br>
+    • Oboseală persistentă după 48h<br>
+    • Iritabilitate sau anxietate crescute<br>
+    • Dureri articulare noi sau intensificate
+  </div>
+  <div class="prog-section">
+    <h3>📏 Înregistrează măsurători</h3>
+    <div class="tip" style="margin-bottom:8px"><strong>Când:</strong> O dată pe săptămână, dimineața, pe nemâncate, aceeași zi și condiții. Recomandare: Duminică sau Luni dimineața.</div>
+    <div class="mi-row">
+      <div class="mi"><label>Data</label><input type="date" id="m-date"></div>
+      <div class="mi"><label>Săptămâna</label>
+        <select id="m-week">
+          <option value="1">Săpt 1</option><option value="2">Săpt 2</option><option value="3">Săpt 3</option><option value="4">Săpt 4</option>
+          <option value="5">Săpt 5</option><option value="6">Săpt 6</option><option value="7">Săpt 7</option><option value="8">Săpt 8</option>
+          <option value="9">Săpt 9</option><option value="10">Săpt 10</option><option value="11">Săpt 11</option><option value="12">Săpt 12</option>
+        </select>
+      </div>
+    </div>
+    <div class="mi-row">
+      <div class="mi"><label>Greutate (kg)</label><input type="number" id="m-weight" placeholder="89.0" step="0.1"></div>
+      <div class="mi"><label>Circumf. abdominală (cm)</label><input type="number" id="m-waist" placeholder="96" step="0.5"></div>
+    </div>
+    <div class="mi-row">
+      <div class="mi"><label>Calitate somn (1–10)</label><input type="number" id="m-sleep" placeholder="6" min="1" max="10"></div>
+      <div class="mi"><label>Energie antrenament (1–10)</label><input type="number" id="m-energy" placeholder="7" min="1" max="10"></div>
+    </div>
+    <div class="mi-row">
+      <div class="mi"><label>Puls odihnă dimineața</label><input type="number" id="m-hr" placeholder="62"></div>
+      <div class="mi"><label>Dureri articulare (0–5)</label><input type="number" id="m-pain" placeholder="2" min="0" max="5"></div>
+    </div>
+    <button class="save-btn" onclick="saveMetric()">💾 Salvează</button>
+  </div>
+  <div class="prog-section">
+    <h3>🎯 Obiective analize la 3 luni</h3>
+    <div class="card" style="font-size:13px;line-height:1.8;color:var(--muted)">
+      • HOMA-IR → sub 2.5 &nbsp;<em>(actual: 4.37)</em><br>
+      • Testosteron → peste 12 nmol/L &nbsp;<em>(actual: 8.2)</em><br>
+      • Vitamina D → 30–55 ng/mL &nbsp;<em>(actual: 21.7)</em><br>
+      • VSH → sub 15 &nbsp;<em>(actual: 23)</em><br>
+      • Glicemie → 60–99 mg/dL &nbsp;<em>(actual: 103)</em>
+    </div>
+  </div>
+  <div class="prog-section">
+    <h3>📝 Istoric</h3>
+    <div id="hist-list"></div>
+  </div>
+  <div class="prog-section">
+    <h3>🤖 Analiză cu Claude</h3>
+    <div class="card" style="background:linear-gradient(135deg,#DDD0FF,#C4E4FF)">
+      <div style="font-size:13px;line-height:1.7;color:var(--ink);margin-bottom:12px">
+        Generează un rezumat al progresului tău și trimite-l într-o conversație cu Claude pentru o analiză detaliată.
+      </div>
+      <button class="save-btn" style="background:#6B4FD8" onclick="exportForClaude()">📋 Generează raport pentru Claude</button>
+    </div>
+    <div id="export-out" style="display:none;margin-top:10px">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong style="font-size:13px">📄 Raport generat</strong>
+          <button onclick="copyExport()" style="background:var(--green);color:white;border:none;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">📋 Copiază</button>
+        </div>
+        <textarea id="export-txt" readonly style="width:100%;min-height:200px;border:1.5px solid var(--border);border-radius:var(--rs);padding:10px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.6;color:var(--ink);background:var(--cream);resize:vertical"></textarea>
+        <div class="tip" style="margin-top:8px;margin-bottom:0"><strong>Cum folosești:</strong> Apasă Copiază, deschide Claude (claude.ai) și lipește textul direct.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TIMER ═══ -->
+<div id="timer-ov" class="timer-ov">
+  <div class="t-top">
+    <button class="t-close" onclick="closeTimer()">✕</button>
+    <div id="t-sess" style="font-size:11px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;text-align:center;flex:1;padding:0 8px"></div>
+    <div id="t-cnt" style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700"></div>
+  </div>
+  <div class="t-bar"><div class="t-fill" id="t-fill" style="width:0%"></div></div>
+  <div class="t-phase" id="t-phase">PREGĂTIRE</div>
+  <div class="t-name" id="t-name">—</div>
+  <div class="t-clock" id="t-clock">0:00</div>
+  <div class="t-pills">
+    <div class="t-pill" id="tp1"></div>
+    <div class="t-pill" id="tp2"></div>
+    <div class="t-pill" id="tp3"></div>
+  </div>
+  <div class="t-info" id="t-info"></div>
+  <div class="t-next">
+    <span style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3)">⏭ Urmează</span>
+    <strong id="t-next">—</strong>
+  </div>
+  <div class="t-ctrls">
+    <button class="ctrl ctrl-w" id="t-pause" onclick="pauseTimer()">⏸ Pauză</button>
+    <button class="ctrl ctrl-g" id="t-nxt" onclick="nextStep()">⏭ Urmează</button>
+    <button class="ctrl ctrl-s" onclick="skipStep()">↷</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATE — EXERCIȚII UPPER BODY (7 exerciții complete)
+// Piept · Spate · Umeri · Biceps · Triceps · Core · Șolduri
+// 2 serii · gantere max 9kg · benzi elastice · saltea · scaun
+// ═══════════════════════════════════════════════════════════
+const UPPER = {
+  exercises: [
+    // 1. TRAGERE — Spate (prioritate pentru postura și umăr)
+    {
+      id:"bent_over_row",
+      name:"Bent-Over Row",
+      icon:"🎣",
+      equip:["Gantere"],
+      phase:{
+        1:{sets:2,reps:"10–12",rest:90,weight:"6–7 kg per mână"},
+        2:{sets:2,reps:"12–14",rest:90,weight:"8–9 kg"},
+        3:{sets:2,reps:"14–15",rest:75,weight:"9 kg + tempo 4 sec"}
+      },
+      muscles_main:["Latissimus dorsi","Romboid","Trapez mijlociu"],
+      muscles_sec:["Biceps","Infraspinos"],
+      technique:"Din picioare, genunchi ușor îndoiți, aplecat la ~45° față. Spatele DREPT și neutru — nu rotunjit. Ganterele atârnă față. Trage coatele spre tavan (nu lateral), strânge omoplații la final, ține 1 sec. Coboară lent 3 sec. Core activat tot timpul.",
+      alt:"Disconfort lombar? Sprijină un genunchi și o mână pe canapea pentru suport."
+    },
+    // 2. SPATE UMĂR POSTERIOR — Rear Delt + rotatori (sănătate umăr)
+    {
+      id:"band_pull_apart",
+      name:"Band Pull-Apart",
+      icon:"↔️",
+      equip:["Bandă elastică"],
+      phase:{
+        1:{sets:2,reps:"20",rest:60,weight:"bandă ușoară"},
+        2:{sets:2,reps:"20",rest:60,weight:"bandă medie"},
+        3:{sets:2,reps:"25",rest:60,weight:"bandă medie"}
+      },
+      muscles_main:["Deltoid posterior","Romboid","Trapez mijlociu"],
+      muscles_sec:["Infraspinos","Teres minor"],
+      technique:"Din picioare, ții banda cu ambele mâini în față la lățimea umerilor, brațele orizontale. Întinde banda lateral până ajunge la nivelul pieptului — strânge omoplații ferm la final. Revin lent. Nu cobori brațele. Zero punct de prindere necesar — banda stă în mâini.",
+      alt:""
+    },
+    // 3. ÎMPINGERE — Piept (push)
+    {
+      id:"pushup",
+      name:"Push-Up",
+      icon:"💪",
+      equip:["Saltea / podea"],
+      phase:{
+        1:{sets:2,reps:"8–10",rest:90,weight:"greutate corp"},
+        2:{sets:2,reps:"12–15",rest:90,weight:"greutate corp"},
+        3:{sets:2,reps:"12–15",rest:90,weight:"bandă elastică pe spate"}
+      },
+      muscles_main:["Pectoral mare","Triceps","Deltoid anterior"],
+      muscles_sec:["Core","Serratus anterior"],
+      technique:"Corp rigid cap-călcâie — nu lăsa bazinul să cadă. Coatele la 45° față de trunchi, nu la 90°. Coboară lent 3 sec, pauză 1 sec jos, ridică-te controlat. Privești oblic înainte.",
+      alt:"Prea greu? Mâinile pe canapea (Push-Up înclinat). Durere umăr? Îngustează baza mâinilor 5–8 cm."
+    },
+    // 4. ÎMPINGERE SUS — Umeri
+    {
+      id:"overhead_press",
+      name:"Overhead Press",
+      icon:"🎯",
+      equip:["Gantere"],
+      phase:{
+        1:{sets:2,reps:"8–10",rest:90,weight:"5–6 kg"},
+        2:{sets:2,reps:"10–12",rest:90,weight:"7–9 kg"},
+        3:{sets:2,reps:"12",rest:75,weight:"9 kg + tempo 4-1-1"}
+      },
+      muscles_main:["Deltoid mediu","Deltoid anterior","Triceps"],
+      muscles_sec:["Trapez superior","Core stabilizator"],
+      technique:"Din picioare, genunchi ușor îndoiți, core strâns. Ganterele la nivelul umerilor, palmele față. Ridică până brațele sunt drepte. Coboară lent 3 sec. Nu arcui lomba — dacă se arcuiește, scade greutatea.",
+      alt:"Durere umăr? Lateral Raise cu gantere 3–4 kg până la 90°."
+    },
+    // 5. BICEPS
+    {
+      id:"biceps_curl",
+      name:"Biceps Curl",
+      icon:"🦾",
+      equip:["Gantere"],
+      phase:{
+        1:{sets:2,reps:"12",rest:60,weight:"6–7 kg"},
+        2:{sets:2,reps:"14",rest:60,weight:"8–9 kg"},
+        3:{sets:2,reps:"15 (Hammer Curl)",rest:60,weight:"9 kg"}
+      },
+      muscles_main:["Biceps brahial","Brahial"],
+      muscles_sec:["Brahioradial"],
+      technique:"Din picioare, coatele fixe lângă corp — nu balansa corpul. Ridică o ganteră, supinând palma la vârf. Coboară lent 3 sec. Alternezi stânga-dreapta. Faza 3: Hammer Curl cu palmele față-față tot parcursul.",
+      alt:"Cu bandă elastică: stai pe bandă, trage identic."
+    },
+    // 6. TRICEPS
+    {
+      id:"triceps_dip",
+      name:"Triceps Dip",
+      icon:"🔺",
+      equip:["Scaun / canapea"],
+      phase:{
+        1:{sets:2,reps:"10",rest:60,weight:"greutate corp — genunchi îndoiți"},
+        2:{sets:2,reps:"12",rest:60,weight:"greutate corp — picioare mai departe"},
+        3:{sets:2,reps:"15",rest:60,weight:"3–4 kg pe coapse"}
+      },
+      muscles_main:["Triceps"],
+      muscles_sec:["Deltoid anterior","Pectoral inferior"],
+      technique:"Mâinile pe marginea scaunului, degetele înainte. Coboară corpul până coatele ajung la 90° — NU mai jos (protejează umărul). Ridică-te împingând în mâini. Ține corpul aproape de scaun.",
+      alt:"Durere umăr? Extensii triceps cu banda elastică sub picior, trage în sus cu ambele mâini."
+    },
+    // 7. CORE + STABILIZATORI UMĂR — Exercițiul combinat special
+    {
+      id:"plank_row",
+      name:"Plank cu Dumbbell Row",
+      icon:"🪵",
+      equip:["Gantere","Saltea izopren"],
+      phase:{
+        1:{sets:2,reps:"6 per parte",rest:75,weight:"4–5 kg"},
+        2:{sets:2,reps:"8 per parte",rest:75,weight:"6–7 kg"},
+        3:{sets:2,reps:"10 per parte",rest:75,weight:"7–8 kg"}
+      },
+      muscles_main:["Core (transvers, oblicuri)","Latissimus dorsi","Romboid"],
+      muscles_sec:["Deltoid posterior","Stabilizatori umăr","Gluteu mare"],
+      technique:"Poziție de plank cu brațele drepte, fiecare mână pe o ganteră. Corp rigid — nu roti șoldurile. Trage o ganteră spre sold (coate pe lângă corp), coboară lent, repetă pe cealaltă parte. Acesta este exercițiul cheie al sesiunii — lucrează simultan core-ul, spatele și stabilizatorii umărului.",
+      alt:"Prea greu? Execută din poziție de plank pe genunchi."
+    },
+    // 8. ȘOLDURI & FESIERI — finalizare sesiune
+    {
+      id:"glute_bridge",
+      name:"Glute Bridge",
+      icon:"🌉",
+      equip:["Saltea izopren","Ganteră opțional"],
+      phase:{
+        1:{sets:2,reps:"15",rest:60,weight:"greutate corp sau 4–6 kg pe șold"},
+        2:{sets:2,reps:"18–20",rest:60,weight:"6 kg + ține 2 sec sus"},
+        3:{sets:2,reps:"12 per parte (single leg)",rest:75,weight:"greutate corp"}
+      },
+      muscles_main:["Fesier mare","Ischiogambieri"],
+      muscles_sec:["Core","Stabilizatori lombari","Adductori"],
+      technique:"Culcat pe saltea, genunchi îndoiți la 90°, picioarele plate pe podea. Ganteră mică opțional pe șold. Ridică bazinul contractând fesierii — corp drept umăr-genunchi. Ține 1–2 sec sus, coboară controlat. ZERO compresie spinală și ZERO stres pe genunchi. Faza 3: single-leg — un picior întins, ridică din celălalt.",
+      alt:""
+    }
+  ],
+  warmup:[
+    "🚶 2 min mers pe loc cu ridicarea genunchilor",
+    "🔄 10 rotații umăr față + 10 înapoi (brațe întinse)",
+    "🐈 8× Cat-Cow pe saltea (respirație sincronizată)",
+    "↔️ 15× Band Pull-Apart cu bandă ușoară (sau strângere omoplați fără bandă)",
+    "💪 10 Push-Up pe perete (mâinile pe perete, din picioare)",
+    "🪵 20 sec Plank pe antebrațe — activare generală"
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════
+// MOBILITATE
+// ═══════════════════════════════════════════════════════════
+const MOB_EX = [
+  {id:"m1",name:"90/90 Hip Stretch",icon:"🦯",equip:["Saltea"],
+   phase:{1:{sets:2,reps:"60 sec/parte",rest:15},2:{sets:2,reps:"60 sec",rest:15},3:{sets:2,reps:"60 sec",rest:15}},
+   muscles_main:["Piriform","Rotatori externi șold"],muscles_sec:["Psoas","Iliac"],
+   technique:"Șezut cu ambii genunchi la 90°, un picior în față și unul lateral. Rămâi vertical, aplecate ușor față pentru intensitate. Respiră profund — la fiecare expir lasă-te mai jos.",alt:""},
+  {id:"m2",name:"Pigeon Pose",icon:"🕊️",equip:["Saltea"],
+   phase:{1:{sets:2,reps:"60 sec/parte",rest:15},2:{sets:2,reps:"60 sec",rest:15},3:{sets:2,reps:"60 sec",rest:15}},
+   muscles_main:["Piriform","Gluteu mediu și mic"],muscles_sec:["Psoas"],
+   technique:"Din 4 labe, aduce genunchiul drept spre mâna dreaptă, glezna spre mâna stângă. Extinde piciorul stâng înapoi. Aplecate față cu brațele extinse. Dacă e prea intens, pui o pernă sub șoldul drept.",alt:""},
+  {id:"m3",name:"Couch Stretch",icon:"🛋️",equip:["Saltea","Perete"],
+   phase:{1:{sets:2,reps:"45 sec/parte",rest:15},2:{sets:2,reps:"60 sec",rest:15},3:{sets:2,reps:"60 sec",rest:15}},
+   muscles_main:["Psoas","Iliac","Rectus femoris"],muscles_sec:["Gluteu mare"],
+   technique:"Un genunchi pe saltea lângă perete, gamb rezemat de perete. Celălalt picior în față la 90°. Menține spatele drept și activează fesierii. Esențial pentru flexorii șoldului tensionați de sedentarism.",alt:""},
+  {id:"m4",name:"Thread the Needle",icon:"🧵",equip:["Saltea"],
+   phase:{1:{sets:2,reps:"8/parte",rest:15},2:{sets:2,reps:"10/parte",rest:15},3:{sets:2,reps:"10/parte",rest:15}},
+   muscles_main:["Coloana toracală","Romboid"],muscles_sec:["Deltoid posterior"],
+   technique:"Din 4 labe. Înfilează brațul drept pe sub corpul stâng cât mai departe. Umărul drept atinge saltea. Ține 2–3 sec, revino. Mobilizează coloana toracală fără stres lombar.",alt:""},
+  {id:"m5",name:"Cat-Cow",icon:"🐈",equip:["Saltea"],
+   phase:{1:{sets:2,reps:"10",rest:15},2:{sets:2,reps:"10",rest:15},3:{sets:2,reps:"12",rest:15}},
+   muscles_main:["Coloana lombară","Coloana toracală"],muscles_sec:["Abdomen","Multifidus"],
+   technique:"Din 4 labe. Cat: arcuiește spatele spre tavan, bărbia la piept, expiră. Cow: lasă burta spre podea, ridică capul și coccisul, inspiră. Ritm sincronizat cu respirația.",alt:""},
+  {id:"m6",name:"Supine Twist",icon:"🌀",equip:["Saltea"],
+   phase:{1:{sets:1,reps:"45 sec/parte",rest:0},2:{sets:1,reps:"45 sec",rest:0},3:{sets:1,reps:"45 sec",rest:0}},
+   muscles_main:["Oblicuri","Coloana toracală"],muscles_sec:["Piriform"],
+   technique:"Culcat pe spate. Aduce genunchii la piept, lasă-i să cadă într-o parte. Brațele la 90° pe saltea, privești spre opusul genunchilor. Umărul opus rămâne lipit de saltea.",alt:""},
+  {id:"m7",name:"Child's Pose",icon:"🙏",equip:["Saltea"],
+   phase:{1:{sets:1,reps:"90 sec",rest:0},2:{sets:1,reps:"90 sec",rest:0},3:{sets:1,reps:"90 sec",rest:0}},
+   muscles_main:["Latissimus dorsi","Coloana lombară","Psoas"],muscles_sec:["Umeri","Trapez"],
+   technique:"Genunchi pe saltea, șezut pe călcâie, brațele extinse față. Fruntea atinge saltea. Respiră adânc și lasă-te mai jos la fiecare expir. Decompresie naturală lombară.",alt:""}
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentPhase = 1;
+let timerSteps=[], stepIdx=0, timeLeft=0, timerInt=null, timerOn=false;
+let metrics=[];
+try{ metrics=JSON.parse(localStorage.getItem('cristi-v4')||'[]'); }catch(e){}
+
+// Week log — ce antrenamente a făcut în săptămâna curentă
+let weekLog=[];
+try{ weekLog=JSON.parse(localStorage.getItem('cristi-weeklog')||'[]'); }catch(e){}
+
+const WEEK_ACTIVITIES = [
+  {id:'upper',label:'Upper Body',icon:'💪',color:'#C8F0D8'},
+  {id:'run',label:'Alergare Z2',icon:'🏃',color:'#C4E4FF'},
+  {id:'pilates_lower',label:'Pilates Lower',icon:'🟣',color:'#DDD0FF'},
+  {id:'pilates_core',label:'Pilates Core',icon:'🟣',color:'#DDD0FF'},
+  {id:'mobility',label:'Mobilitate',icon:'🧘',color:'#FFF3C0'},
+  {id:'rest',label:'Odihnă',icon:'😴',color:'#E8EDE9'}
+];
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+function showTab(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs=['t-home','t-workout','t-run','t-mobility','t-nutrition','t-progress'];
+  const ti=tabs.indexOf(id);
+  if(ti>=0) document.querySelectorAll('.ntab')[ti].classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PILATES VIEW
+// ═══════════════════════════════════════════════════════════
+function showPilates(type){
+  const isLower = type==='lower';
+  const title = isLower ? 'Pilates Lower Body & Șolduri' : 'Pilates Core & Abdomen';
+  const searches = isLower
+    ? ['pilates lower body', 'pilates hips glutes', 'pilates inner thighs']
+    : ['pilates core abs', 'pilates flat stomach', 'pilates obliques'];
+
+  let html = `<div class="wo-hdr" style="background:linear-gradient(135deg,#DDD0FF,#C8F0D8)">
+    <h2>🟣 ${title}</h2>
+    <p>Move with Nicole · YouTube · 30–40 minute</p>
+    <div class="wo-stats">
+      <div class="stat"><div class="sv">30–40</div><div class="sl">Minute</div></div>
+      <div class="stat"><div class="sv">Saltea</div><div class="sl">Echipament</div></div>
+      <div class="stat"><div class="sv">Blând</div><div class="sl">Intensitate</div></div>
+    </div>
+  </div>`;
+
+  html += `<div class="tip"><strong>Cum găsești sesiunea:</strong> Deschide YouTube și caută <strong>"Move with Nicole ${isLower?'lower body hips':'core abs'}"</strong>. Alege o sesiune de 30–40 min fără echipament.</div>`;
+
+  html += `<div class="card">
+    <div class="card-title">🔍 Căutări recomandate pe YouTube</div>
+    <div style="font-size:13px;line-height:1.9;color:var(--muted)">`;
+  searches.forEach(s=>{
+    html+=`• <strong style="color:var(--ink)">"Move with Nicole ${s}"</strong><br>`;
+  });
+  html+=`</div></div>`;
+
+  html+=`<div class="card">
+    <div class="card-title">${isLower?'🦵 Ce să conțină sesiunea':'🎯 Ce să conțină sesiunea'}</div>
+    <div style="font-size:13px;line-height:1.9;color:var(--muted)">`;
+  if(isLower){
+    html+=`• Activare fesieri (clamshell, fire hydrant)<br>• Exerciții pentru abductori șold<br>• Inner thigh (adductori)<br>• Ischiogambieri<br>• Fără impact pe genunchi<br>• Fără sărituri`;
+  } else {
+    html+=`• Transvers abdominal (respirație)<br>• Oblicuri (rotații controlate)<br>• Stabilizare lombară<br>• Dead bug variante<br>• Fără crunch-uri clasice (protejează discurile)<br>• Tempo lent și controlat`;
+  }
+  html+=`</div></div>`;
+
+  html+=`<div class="warn"><strong>Regula de bază:</strong> Dacă o mișcare doare în zona lombară sau genunchi — sari peste ea și continuă cu restul sesiunii. Nu forța.</div>`;
+
+  document.getElementById('pilates-content').innerHTML=html;
+
+  // Switch to pilates tab
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('t-pilates').classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// WEEK TRACKER
+// ═══════════════════════════════════════════════════════════
+function renderWeekTracker(){
+  const container=document.getElementById('week-tracker');
+  const btnContainer=document.getElementById('log-btns');
+
+  // Verifica dacă a trecut o săptămână (luni = zi nouă)
+  const today=new Date();
+  const dayOfWeek=today.getDay(); // 0=Sun, 1=Mon
+  const lastMonday=new Date(today);
+  lastMonday.setDate(today.getDate()-((dayOfWeek+6)%7));
+  lastMonday.setHours(0,0,0,0);
+
+  const lastReset=localStorage.getItem('cristi-weekreset');
+  if(!lastReset||new Date(lastReset)<lastMonday){
+    weekLog=[];
+    localStorage.setItem('cristi-weeklog','[]');
+    localStorage.setItem('cristi-weekreset',lastMonday.toISOString());
+  }
+
+  // Contorizare
+  const counts={upper:0,run:0,pilates_lower:0,pilates_core:0,mobility:0,rest:0};
+  weekLog.forEach(l=>{ if(counts[l]!==undefined) counts[l]++; });
+
+  const targets={upper:1,run:2,pilates_lower:1,pilates_core:1,mobility:1,rest:2};
+  const total=weekLog.length;
+
+  let html='';
+  if(total===0){
+    html='<div style="color:var(--muted);font-size:13px;padding:4px 0">Nicio activitate înregistrată săptămâna aceasta.</div>';
+  } else {
+    WEEK_ACTIVITIES.forEach(a=>{
+      const c=counts[a.id]||0;
+      const t=targets[a.id]||1;
+      const done=c>=t;
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px">
+        <span style="font-size:16px">${done?'✅':a.icon}</span>
+        <span style="${done?'color:var(--green);font-weight:700':'color:var(--ink)'}">${a.label}</span>
+        <span style="color:var(--muted);font-size:12px;margin-left:auto">${c}/${t}</span>
+      </div>`;
+    });
+  }
+  container.innerHTML=html;
+
+  // Butoane de logare
+  let bhtml='';
+  WEEK_ACTIVITIES.filter(a=>a.id!=='rest').forEach(a=>{
+    bhtml+=`<button onclick="logActivity('${a.id}')" style="background:${a.color};border:none;border-radius:20px;padding:6px 12px;font-family:inherit;font-size:11px;font-weight:700;color:#1E2A24;cursor:pointer">${a.icon} ${a.label}</button>`;
+  });
+  bhtml+=`<button onclick="logActivity('rest')" style="background:#E8EDE9;border:none;border-radius:20px;padding:6px 12px;font-family:inherit;font-size:11px;font-weight:700;color:#1E2A24;cursor:pointer">😴 Odihnă</button>`;
+  btnContainer.innerHTML=`<div style="font-size:11px;color:var(--muted);font-weight:600;width:100%;margin-bottom:4px">+ Înregistrează activitatea de azi:</div>${bhtml}`;
+}
+
+function logActivity(id){
+  weekLog.push(id);
+  try{ localStorage.setItem('cristi-weeklog',JSON.stringify(weekLog)); }catch(e){}
+  renderWeekTracker();
+}
+
+// ═══════════════════════════════════════════════════════════
+// WORKOUT VIEW — UPPER BODY
+// ═══════════════════════════════════════════════════════════
+function openWorkout(wid){
+  if(wid!=='upper') return;
+
+  const exList=UPPER.exercises;
+  const totalSets=exList.reduce((a,ex)=>a+(ex.phase[currentPhase]?.sets||2),0);
+
+  let html=`<div class="wo-hdr">
+    <h2>💪 Upper Body</h2>
+    <p>Toate grupele musculare · 2 serii · ~45–50 min</p>
+    <div class="wo-stats">
+      <div class="stat"><div class="sv">${exList.length}</div><div class="sl">Exerciții</div></div>
+      <div class="stat"><div class="sv">${totalSets}</div><div class="sl">Serii total</div></div>
+      <div class="stat"><div class="sv">5–6</div><div class="sl">RPE max</div></div>
+    </div>
+  </div>`;
+
+  html+=`<button class="start-btn" onclick="startUpperTimer()">▶ Pornește cu timer și semnale sonore</button>`;
+
+  // Faza selector
+  html+=`<div style="display:flex;gap:6px;margin-bottom:12px">`;
+  [1,2,3].forEach(p=>{
+    const labels=['Faza 1 (Săpt 1–4)','Faza 2 (Săpt 5–8)','Faza 3 (Săpt 9–12)'];
+    html+=`<button onclick="setPhase(${p})" id="ph-btn-${p}" style="flex:1;padding:8px 4px;border:2px solid ${currentPhase===p?'var(--green)':'var(--border)'};border-radius:var(--r);background:${currentPhase===p?'var(--mint)':'var(--card)'};font-family:inherit;font-size:11px;font-weight:700;color:${currentPhase===p?'#1A5C3A':'var(--muted)'};cursor:pointer">${labels[p-1]}</button>`;
+  });
+  html+=`</div>`;
+
+  // Avertisment suprasolicitare
+  html+=`<div class="warn" style="margin-bottom:12px">
+    <strong>⚠️ Regula serii:</strong> 2 serii per exercițiu. Dacă somnul se deteriorează după antrenament → la sesiunea viitoare fă doar 1 serie sau sari un exercițiu. Nu adăuga a 3-a serie decât după 3 săptămâni consecutive fără probleme de recuperare.
+  </div>`;
+
+  // Warmup
+  html+=`<div class="warmup-box"><h3>🔥 Încălzire — 8 minute (OBLIGATORIE)</h3>`;
+  UPPER.warmup.forEach(w=>{ html+=`<div class="warmup-item">• ${w}</div>`; });
+  html+=`</div>`;
+
+  // Exerciții
+  exList.forEach((ex,i)=>{
+    const ph=ex.phase[currentPhase];
+    const cols=['bm','bp','bs','bl','by','bc','bm'];
+    const bc=cols[i%cols.length];
+    const mB=ex.muscles_main.map(m=>`<span class="badge ${bc}">${m}</span>`).join('');
+    const sB=ex.muscles_sec.map(m=>`<span class="badge" style="background:#F0F0F0;color:#666">${m}</span>`).join('');
+    const eB=ex.equip.map(e=>`<span class="eb">🏠 ${e}</span>`).join('');
+    const nextEx=exList[i+1];
+    const nextHtml=nextEx
+      ?`<div style="background:#F0FDF6;border-radius:var(--rs);padding:7px 10px;margin-top:8px;font-size:12px;color:var(--muted)">⏭ <strong style="color:var(--ink)">Urmează:</strong> ${nextEx.icon} ${nextEx.name}</div>`
+      :`<div style="background:#F7F7F7;border-radius:var(--rs);padding:7px 10px;margin-top:8px;font-size:12px;color:var(--muted)">✅ Ultimul exercițiu — bravo!</div>`;
+    const altHtml=ex.alt?`<div class="alt-box"><strong>⚡ Alternativă</strong><br>${ex.alt}</div>`:'';
+
+    html+=`<div class="ex-card">
+      <div class="ex-hdr" onclick="toggleEx('ex-${ex.id}','tg-${ex.id}')">
+        <div class="ex-num">${i+1}</div>
+        <div class="ex-main">
+          <div class="ex-name">${ex.icon} ${ex.name}</div>
+          <div class="ex-meta">${ph.sets} serii × ${ph.reps} · ${ph.weight} · Pauză ${ph.rest}s</div>
+        </div>
+        <div class="ex-tog" id="tg-${ex.id}">▾</div>
+      </div>
+      <div class="ex-det" id="ex-${ex.id}">
+        <div class="sets-row">
+          <div class="set-item">Serii<span>${ph.sets}</span></div>
+          <div class="set-item">Repetări<span>${ph.reps}</span></div>
+          <div class="set-item">Greutate<span style="font-size:12px">${ph.weight}</span></div>
+          <div class="set-item">Pauză<span>${ph.rest} sec</span></div>
+        </div>
+        <div class="info-box">
+          <strong>📖 Cum se execută:</strong><br>${ex.technique}
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">${eB}</div>
+          <div class="muscles-row">
+            <span style="font-size:10px;color:var(--muted);font-weight:700;width:100%;margin-bottom:3px">🎯 PRINCIPALE:</span>${mB}
+            <span style="font-size:10px;color:var(--muted);font-weight:700;width:100%;margin:5px 0 3px">➕ SECUNDARE:</span>${sB}
+          </div>
+        </div>
+        ${altHtml}${nextHtml}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('wo-content').innerHTML=html;
+  showTab('t-workout');
+}
+
+function setPhase(p){
+  currentPhase=p;
+  openWorkout('upper');
+}
+
+function toggleEx(dId,tId){
+  document.getElementById(dId).classList.toggle('open');
+  document.getElementById(tId).classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MOBILITY LIST
+// ═══════════════════════════════════════════════════════════
+function renderMobility(){
+  const cols=['bm','bp','bs','bl','by','bc','bm'];
+  document.getElementById('mob-list').innerHTML=MOB_EX.map((ex,i)=>{
+    const ph=ex.phase[currentPhase]||ex.phase[1];
+    const bc=cols[i%cols.length];
+    const mB=ex.muscles_main.map(m=>`<span class="badge ${bc}">${m}</span>`).join('');
+    const sB=ex.muscles_sec.map(m=>`<span class="badge" style="background:#F0F0F0;color:#666">${m}</span>`).join('');
+    const eB=ex.equip.map(e=>`<span class="eb">🏠 ${e}</span>`).join('');
+    const nextEx=MOB_EX[i+1];
+    const nextHtml=nextEx
+      ?`<div style="background:#F0FDF6;border-radius:var(--rs);padding:7px 10px;margin-top:8px;font-size:12px;color:var(--muted)">⏭ <strong style="color:var(--ink)">Urmează:</strong> ${nextEx.icon} ${nextEx.name}</div>`
+      :`<div style="background:#F7F7F7;border-radius:var(--rs);padding:7px 10px;margin-top:8px;font-size:12px;color:var(--muted)">✅ Sesiune completă!</div>`;
+    return `<div class="ex-card">
+      <div class="ex-hdr" onclick="toggleEx('mob-${ex.id}','mtg-${ex.id}')">
+        <div class="ex-num">${i+1}</div>
+        <div class="ex-main">
+          <div class="ex-name">${ex.icon} ${ex.name}</div>
+          <div class="ex-meta">${ph.sets||1} × ${ph.reps}</div>
+        </div>
+        <div class="ex-tog" id="mtg-${ex.id}">▾</div>
+      </div>
+      <div class="ex-det" id="mob-${ex.id}">
+        <div class="info-box">
+          <strong>📖 Cum se execută:</strong><br>${ex.technique}
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">${eB}</div>
+          <div class="muscles-row">
+            <span style="font-size:10px;color:var(--muted);font-weight:700;width:100%;margin-bottom:3px">🎯 PRINCIPALE:</span>${mB}
+            <span style="font-size:10px;color:var(--muted);font-weight:700;width:100%;margin:5px 0 3px">➕ SECUNDARE:</span>${sB}
+          </div>
+        </div>
+        ${nextHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════════════════
+let audioCtx;
+function getAudio(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+function unlockAudio(){
+  const c=getAudio();
+  const o=c.createOscillator(),g=c.createGain();
+  g.gain.setValueAtTime(0.0001,c.currentTime);
+  o.connect(g);g.connect(c.destination);
+  o.start();o.stop(c.currentTime+0.01);
+}
+function beep(freq,dur,type='sine',vol=0.45){
+  try{
+    const c=getAudio(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+dur);
+    o.start();o.stop(c.currentTime+dur);
+  }catch(e){}
+}
+function beepStart(){ beep(660,.1);setTimeout(()=>beep(880,.15),150); }
+function beepEnd(){   beep(880,.1);setTimeout(()=>beep(660,.1),120);setTimeout(()=>beep(440,.2),240); }
+function beepCount(n){ const f={3:480,2:560,1:660}; beep(f[n]||550,.12,'square',.35); }
+function beepRest(){  beep(440,.2,'sine',.25);setTimeout(()=>beep(350,.3),220); }
+
+// ═══════════════════════════════════════════════════════════
+// TIMER ENGINE
+// ═══════════════════════════════════════════════════════════
+function buildUpperSteps(){
+  const steps=[];
+  steps.push({type:'prep',name:'🔥 Fă mai întâi încălzirea!',dur:10,info:'Parcurge cele 6 exerciții de încălzire (~8 min). Apasă ▶ când ești gata.',d1:'',d2:'',d3:''});
+  UPPER.exercises.forEach((ex,xi)=>{
+    const ph=ex.phase[currentPhase];
+    for(let s=1;s<=ph.sets;s++){
+      steps.push({type:'countdown',name:`${ex.icon} ${ex.name}`,dur:5,
+        info:`<strong>Pregătire seria ${s}/${ph.sets}</strong> · ${ph.weight}`,
+        d1:`Seria ${s}/${ph.sets}`,d2:ph.weight,d3:'',eid:ex.id,xi,s});
+      const repN=parseInt(ph.reps)||10;
+      steps.push({type:'work',name:`${ex.icon} ${ex.name}`,dur:Math.max(30,repN*3+5),
+        info:`<strong>💪 ${ph.reps} repetări</strong> · ${ph.weight}<br>Coborâre lentă 3 sec · sus controlat<br>RPE 5–6 din 10 · lasă 2 rep în rezervă`,
+        d1:`Seria ${s}/${ph.sets}`,d2:ph.reps+' rep',d3:ph.weight,eid:ex.id,xi,s});
+      const isLastSetLastEx=(xi===UPPER.exercises.length-1)&&(s===ph.sets);
+      if(!isLastSetLastEx){
+        const nextEx=s===ph.sets?UPPER.exercises[xi+1]:null;
+        steps.push({type:'rest',
+          name:nextEx?`⏳ Pauză · urmează ${nextEx.icon} ${nextEx.name}`:'⏳ Pauză',
+          dur:ph.rest,
+          info:`🧘 <strong>Odihnă ${ph.rest} sec</strong> — respiră lent și adânc${nextEx?`<br>📋 Urmează: <strong>${nextEx.icon} ${nextEx.name}</strong> · ${nextEx.phase[currentPhase]?.weight}`:''}.`,
+          d1:`${ph.rest}s`,d2:'',d3:'',eid:ex.id,xi,s});
+      }
+    }
+  });
+  steps.push({type:'done',name:'🎉 Upper Body Finalizat!',dur:0,info:'Excelent! 5 min de mers lent și stretching pentru grupele lucrate. Nu uita să înregistrezi activitatea în tracker! 💚',d1:'',d2:'',d3:''});
+  return steps;
+}
+
+function buildMobSteps(){
+  const steps=[];
+  steps.push({type:'prep',name:'🧘 Mobilitate & Recuperare',dur:10,info:'Saltea pregătită. Muzică ambientală recomandată. Nicio grabă.',d1:'',d2:'',d3:''});
+  MOB_EX.forEach((ex,i)=>{
+    const ph=ex.phase[currentPhase]||ex.phase[1];
+    for(let s=1;s<=(ph.sets||1);s++){
+      steps.push({type:'countdown',name:`${ex.icon} ${ex.name}`,dur:5,info:ex.technique,d1:`Runda ${s}/${ph.sets||1}`,d2:'',d3:'',eid:ex.id});
+      const dur=parseInt(ph.reps)||60;
+      steps.push({type:'work',name:`${ex.icon} ${ex.name}`,dur:dur,info:`<strong>🧘 ${ph.reps}</strong><br>${ex.technique}`,d1:`Runda ${s}/${ph.sets||1}`,d2:ph.reps,d3:'',eid:ex.id});
+      const isLast=i===MOB_EX.length-1&&s===(ph.sets||1);
+      if(!isLast) steps.push({type:'rest',name:'⏳ Schimbă poziția',dur:15,info:'Mișcă-te lent spre exercițiul următor. Respiră.',d1:'15 sec',d2:'',d3:'',eid:ex.id});
+    }
+  });
+  steps.push({type:'done',name:'✨ Sesiune completă!',dur:0,info:'Corpul tău mulțumește. Hidratează-te și odihnește-te bine.',d1:'',d2:'',d3:''});
+  return steps;
+}
+
+function startUpperTimer(){ unlockAudio(); timerSteps=buildUpperSteps(); openTimer('Upper Body'); }
+function startMobility(){ unlockAudio(); timerSteps=buildMobSteps(); openTimer('Mobilitate & Recuperare'); }
+
+function openTimer(label){
+  stepIdx=0;
+  document.getElementById('t-sess').textContent=label.toUpperCase();
+  document.getElementById('timer-ov').classList.add('on');
+  loadStep(); resumeTimer();
+}
+function closeTimer(){
+  clearInterval(timerInt); timerOn=false;
+  document.getElementById('timer-ov').classList.remove('on');
+}
+function loadStep(){
+  if(stepIdx>=timerSteps.length){ closeTimer(); return; }
+  const s=timerSteps[stepIdx];
+  timeLeft=s.dur;
+  const clk=document.getElementById('t-clock');
+  clk.className='t-clock';
+  if(s.type==='countdown') clk.classList.add('cd');
+  if(s.type==='rest') clk.classList.add('rest');
+  const lbl={prep:'PREGĂTIRE',countdown:'URMEAZĂ',work:'EXECUȚIE',rest:'PAUZĂ',done:'GATA 🎉'};
+  document.getElementById('t-phase').textContent=lbl[s.type]||'';
+  document.getElementById('t-name').textContent=s.name;
+  document.getElementById('t-info').innerHTML=s.info||'';
+  ['d1','d2','d3'].forEach((k,i)=>{
+    const el=document.getElementById('tp'+(i+1));
+    el.textContent=s[k]||''; el.style.display=s[k]?'':'none';
+  });
+  const nxt=timerSteps[stepIdx+1];
+  document.getElementById('t-next').textContent=nxt?nxt.name:'—';
+  document.getElementById('t-fill').style.width=((stepIdx/Math.max(1,timerSteps.length-1))*100)+'%';
+  document.getElementById('t-cnt').textContent=`${stepIdx+1}/${timerSteps.length}`;
+  document.getElementById('t-nxt').textContent=s.type==='done'?'✕ Închide':'⏭ Urmează';
+  if(s.type==='done'){
+    document.getElementById('t-clock').textContent='✓';
+    clearInterval(timerInt); timerOn=false;
+    beepEnd(); setTimeout(beepEnd,700); return;
+  }
+  updateClock();
+}
+function updateClock(){
+  document.getElementById('t-clock').textContent=`${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+  if(timeLeft<=3&&timeLeft>0) beepCount(timeLeft);
+  if(timeLeft===0){
+    timerSteps[stepIdx]?.type==='work'?beepRest():beepEnd();
+    setTimeout(nextStep,400);
+  }
+}
+function resumeTimer(){
+  if(timerOn) return;
+  const s=timerSteps[stepIdx];
+  if(s?.type==='done') return;
+  timerOn=true; beepStart();
+  timerInt=setInterval(()=>{ if(timerOn){timeLeft--;updateClock();} },1000);
+}
+function pauseTimer(){
+  unlockAudio();
+  timerOn=!timerOn;
+  const btn=document.getElementById('t-pause');
+  if(timerOn){ btn.textContent='⏸ Pauză'; clearInterval(timerInt); resumeTimer(); }
+  else{ btn.textContent='▶ Continuă'; clearInterval(timerInt); }
+}
+function nextStep(){
+  unlockAudio();
+  clearInterval(timerInt); timerOn=false;
+  if(timerSteps[stepIdx]?.type==='done'){ closeTimer(); return; }
+  stepIdx++; loadStep(); resumeTimer();
+}
+function skipStep(){
+  unlockAudio();
+  clearInterval(timerInt); timerOn=false;
+  stepIdx++; loadStep(); resumeTimer();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════════════
+function saveMetric(){
+  const m={
+    date:document.getElementById('m-date').value,
+    week:document.getElementById('m-week').value,
+    weight:document.getElementById('m-weight').value,
+    waist:document.getElementById('m-waist').value,
+    sleep:document.getElementById('m-sleep').value,
+    energy:document.getElementById('m-energy').value,
+    hr:document.getElementById('m-hr').value,
+    pain:document.getElementById('m-pain').value
+  };
+  if(!m.date){ alert('Adaugă data!'); return; }
+  metrics.unshift(m);
+  try{ localStorage.setItem('cristi-v4',JSON.stringify(metrics)); }catch(e){}
+  renderHistory(); alert('✅ Salvat!');
+}
+function renderHistory(){
+  const c=document.getElementById('hist-list');
+  if(!metrics.length){ c.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">Nu ai salvat nicio măsurătoare încă.</div>'; return; }
+  c.innerHTML=metrics.slice(0,12).map(m=>`<div class="hist-item">
+    <div><div style="font-size:11px;color:var(--muted)">${m.date} · Săpt ${m.week}</div>
+    <div style="font-weight:700">${m.weight||'?'} kg ${m.waist?'· '+m.waist+' cm':''}</div></div>
+    <div style="text-align:right;font-size:11px;color:var(--muted)">😴${m.sleep||'?'}/10 ⚡${m.energy||'?'}/10<br>💓${m.hr||'?'} bpm 🦴${m.pain||'?'}/5</div>
+  </div>`).join('');
+}
+
+function trendArrow(first,last,higherIsBetter){
+  if(first===null||last===null||isNaN(first)||isNaN(last)) return '';
+  const diff=last-first;
+  if(Math.abs(diff)<0.001) return '→ stabil';
+  const improving=higherIsBetter?diff>0:diff<0;
+  return `${diff>0?'↑':'↓'} ${diff>0?'+':''}${diff.toFixed(1)} ${improving?'(pozitiv)':'(de urmărit)'}`;
+}
+
+function exportForClaude(){
+  if(!metrics.length){ alert('Nu ai nicio măsurătoare salvată încă.'); return; }
+  const sorted=[...metrics].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const first=sorted[0], last=sorted[sorted.length-1];
+  const n=v=>(v===undefined||v===null||v==='')?null:parseFloat(v);
+
+  let r=`RAPORT PROGRES — Program Cristi\n`;
+  r+=`Generat: ${new Date().toLocaleDateString('ro-RO')}\n`;
+  r+=`Perioadă: ${first.date} (Săpt ${first.week}) → ${last.date} (Săpt ${last.week})\n`;
+  r+=`Total înregistrări: ${metrics.length} · Faza curentă: ${currentPhase}\n\n`;
+  r+=`── TENDINȚĂ (prima vs ultima) ──\n`;
+  r+=`Greutate: ${first.weight||'—'} → ${last.weight||'—'} kg  ${trendArrow(n(first.weight),n(last.weight),false)}\n`;
+  r+=`Abdomen: ${first.waist||'—'} → ${last.waist||'—'} cm  ${trendArrow(n(first.waist),n(last.waist),false)}\n`;
+  r+=`Somn: ${first.sleep||'—'} → ${last.sleep||'—'}/10  ${trendArrow(n(first.sleep),n(last.sleep),true)}\n`;
+  r+=`Energie: ${first.energy||'—'} → ${last.energy||'—'}/10  ${trendArrow(n(first.energy),n(last.energy),true)}\n`;
+  r+=`Puls odihnă: ${first.hr||'—'} → ${last.hr||'—'} bpm  ${trendArrow(n(first.hr),n(last.hr),false)}\n`;
+  r+=`Dureri: ${first.pain||'—'} → ${last.pain||'—'}/5  ${trendArrow(n(first.pain),n(last.pain),false)}\n\n`;
+  r+=`── ISTORIC COMPLET ──\n`;
+  sorted.forEach(m=>{
+    r+=`${m.date} (Săpt ${m.week}): ${m.weight||'—'}kg · ${m.waist||'—'}cm · Somn ${m.sleep||'—'}/10 · Energie ${m.energy||'—'}/10 · Puls ${m.hr||'—'}bpm · Dureri ${m.pain||'—'}/5\n`;
+  });
+  r+=`\n── CONTEXT MEDICAL ──\n`;
+  r+=`HOMA-IR: 4.37 (obiectiv <2.5) · Testosteron: 8.2 nmol/L (obiectiv >12)\n`;
+  r+=`Vitamina D: 21.7 ng/mL (obiectiv 30-55) · VSH: 23 (obiectiv <15) · Glicemie: 103 mg/dL\n`;
+  r+=`Program actual: Upper Body 1x/săpt (2 serii, 7 exerciții) + Alergare Z2 2x/săpt + Pilates Lower Body + Pilates Core + Mobilitate\n`;
+  r+=`Restricții: coloană lombară sensibilă, genunchi sensibili (gantere max 9kg la lower body), istoric durere umăr\n\n`;
+  r+=`── ÎNTREBARE ──\n`;
+  r+=`Pe baza acestor date, cum arată progresul meu? Ar trebui să ajustez ceva în program?`;
+
+  document.getElementById('export-txt').value=r;
+  document.getElementById('export-out').style.display='block';
+  document.getElementById('export-out').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function copyExport(){
+  const ta=document.getElementById('export-txt');
+  ta.select(); ta.setSelectionRange(0,999999);
+  try{
+    navigator.clipboard.writeText(ta.value).then(()=>{
+      alert('✅ Copiat! Acum lipește textul în conversația cu Claude.');
+    }).catch(()=>{ document.execCommand('copy'); alert('✅ Copiat!'); });
+  }catch(e){ document.execCommand('copy'); alert('✅ Copiat!'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',function(){
+  var di=document.getElementById('m-date');
+  if(di) di.value=new Date().toISOString().split('T')[0];
+  renderMobility();
+  renderHistory();
+  renderWeekTracker();
+});
+</script>
+</body>
+</html>
